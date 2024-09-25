@@ -117,7 +117,7 @@ SELECT
     Customer.FirstName, 
     Customer.LastName, 
     Product.Product, 
-    SUM(Betting.Bet_Amt) AS total_bets
+    COUNT(DISTINCT Product.Product)
 FROM 
     Customer
 JOIN 
@@ -127,7 +127,7 @@ JOIN
 JOIN 
     Product ON Betting.Product = Product.Product
 WHERE 
-    Betting.Bet_Amt > 0
+    Betting.Bet_Amt > 0 AND product.product = 'Sportsbook'
 GROUP BY 
     Customer.FirstName, Customer.LastName, Product.Product
 ORDER BY 
