@@ -115,7 +115,9 @@ HAVING
 # Question 09: Now our CRM team want to look at players who only play one product, please write SQL code that shows the players who only play at sportsbook, use the bet_amt > 0 as the key. Show each player and the sum of their bets for both products.
 SELECT 
     Customer.FirstName, 
-    Customer.LastName
+    Customer.LastName, 
+    Product.Product, 
+    SUM(Betting.Bet_Amt) AS total_bets
 FROM 
     Customer
 JOIN 
@@ -125,9 +127,11 @@ JOIN
 JOIN 
     Product ON Betting.Product = Product.Product
 WHERE 
-    Product.Product = 'Sportsbook'
+    Betting.Bet_Amt > 0
 GROUP BY 
-    Customer.FirstName, Customer.LastName;
+    Customer.FirstName, Customer.LastName, Product.Product
+ORDER BY 
+    Customer.LastName, Product.Product;
     
 # Question 10: The last question requires us to calculate and determine a player’s favorite product. This can be determined by the most money staked. Please write a query that will show each players favorite product.
 SELECT 
