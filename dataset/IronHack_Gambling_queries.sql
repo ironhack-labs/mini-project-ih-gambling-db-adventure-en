@@ -203,6 +203,7 @@ WHERE (
     WHERE s2.school_id = student.school_id
     AND s2.GPA > student.GPA
 ) < 3
-ORDER BY school.school_name, student.GPA DESC;
+ORDER BY school.school_name, student.GPA DESC
+LIMIT 3;
 
 
