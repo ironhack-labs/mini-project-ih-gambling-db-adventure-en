@@ -13,7 +13,7 @@ GROUP BY CustomerGroup;
 # BONUS: How would I do this in Excel if I had a much larger data set?
 SELECT Customer.*, Account.CurrencyCode
 FROM Customer
-JOIN Test_Data ON Customer.CustId = Account.CustId;
+JOIN Account ON Customer.CustId = Account.CustId;
 # BONUS Answer: You can load the data into PowerQuery and then you can merge the tables as well.
 
 # Question 04: Now I need to provide a product manager with a summary report that shows, by product and by day how much money has been bet on a particular product. PLEASE note that the transactions are stored in the betting table and there is a product code in that table that is required to be looked up (classid & categortyid) to determine which product family this belongs to. Please write the SQL that would provide the report.
@@ -56,7 +56,7 @@ ORDER BY
     Customer.CustomerGroup;
 
 
-#Question 07: Our VIP team have asked to see a report of all players regardless of whether they have done anything in the complete timeframe or not. In our example, it is possible that not all of the players have been active. Please write an SQL query that shows all players Title, First Name and Last Name and a summary of their bet amount for the complete period of November.
+# Question 07: Our VIP team have asked to see a report of all players regardless of whether they have done anything in the complete timeframe or not. In our example, it is possible that not all of the players have been active. Please write an SQL query that shows all players Title, First Name and Last Name and a summary of their bet amount for the complete period of November.
 SELECT 
     Customer.Title, 
     Customer.FirstName, 
@@ -64,12 +64,12 @@ SELECT
     SUM(Betting.Bet_Amt) AS bets_per_player
 FROM 
     Account
-JOIN 
+LEFT JOIN 
     Customer ON Account.CustId = Customer.CustId
-JOIN 
+LEFT JOIN 
     Betting ON Account.AccountNo = Betting.AccountNo
 WHERE 
-    Betting.BetDate >= '2012-11-01' AND Betting.BetDate <= '2012-11-30'
+    Betting.BetDate >= DATE('2012-11-01') AND Betting.BetDate <= DATE('2012-11-30')
 GROUP BY 
     Customer.Title, Customer.FirstName, Customer.LastName
 ORDER BY 
