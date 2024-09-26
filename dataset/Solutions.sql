@@ -27,13 +27,17 @@ GROUP BY p.product, b.BetDate;
  
  
  
- -- 5 Summary of Sportsbook transactions on or after 1st November
+ -- 5 Summary of Sportsbook transactions on or after 1st November // Double check 
  
- SELECT p.product_name, b.bet_date, SUM(b.bet_amount) AS total_bet_amount
+SELECT p.product, b.BetDate, SUM(b.Bet_Amt) AS total_bet_amount
 FROM betting b
-JOIN product p ON b.product_code = p.product_code
-WHERE b.bet_date >= '2022-11-01' AND p.product_name = 'Sportsbook'
-GROUP BY p.product_name, b.bet_date;
+JOIN product p ON b.ClassId = p.CLASSID AND b.CategoryId = p.CATEGORYID
+WHERE STR_TO_DATE(b.BetDate, '%Y-%m-%d') >= DATE('2012-11-01') 
+-- AND p.product = 'Sprtsbook'
+GROUP BY p.product, b.BetDate;
+
+
+
 
  -- 6 Summary by currency code and customer group after 1st December. // double check this 
  
@@ -41,16 +45,16 @@ GROUP BY p.product_name, b.bet_date;
 FROM betting b
 JOIN account a ON b.AccountNo = a.AccountNo
 JOIN customer c ON a.CustId = c.CustId
-WHERE b.BetDate > '2022-12-01'
+WHERE STR_TO_DATE(b.BetDate,'%Y,%M,%D') > DATE('2022-12-01')
 GROUP BY a.CurrencyCode, c.CustomerGroup;
 
 
--- 7 Report showing all players and their total bet amount for November
+-- 7 Report showing all players and their total bet amount for November -- change the date function 
 
 SELECT c.Title, c.FirstName, c.LastName, SUM(b.Bet_Amt) AS total_bet_amount
 FROM customer c
 LEFT JOIN account a ON c.CustId = a.CustId
-LEFT JOIN betting b ON a.AccountNo = b.AccountNo AND b.BetDate BETWEEN '2022-11-01' AND '2022-11-30'
+LEFT JOIN betting b ON a.AccountNo = b.AccountNo AND STR_TO_DATE(b.BetDate, '%Y,%M,%D') BETWEEN DATE('2022-11-01') AND DATE('2022-11-30')
 GROUP BY c.Title, c.FirstName, c.LastName;
 
 -- 8 Number of products per player and players who play both Sportsbook and Vegas
