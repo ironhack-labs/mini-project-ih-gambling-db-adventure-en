@@ -72,3 +72,24 @@ SELECT b.AccountNo, b.Product, SUM(b.Bet_Amt) AS TotalBetAmount
 FROM betting b
 GROUP BY b.AccountNo, b.Product
 ORDER BY b.AccountNo, TotalBetAmount DESC;
+
+/*q11*/
+SELECT student_name, GPA FROM student
+ORDER BY GPA DESC
+LIMIT 5;
+
+/*q12*/
+SELECT s.school_name, COUNT(st.school_id) AS NumberOfStudents
+FROM school s 
+LEFT JOIN student st ON s.school_id_1 = st.school_id
+GROUP BY s.school_name
+ORDER BY s.school_name;
+
+/*q13*/
+SELECT s.student_name, sch.school_name
+FROM student s
+JOIN school sch ON s.school_id = sch.school_id_1
+WHERE (SELECT COUNT(*) 
+        FROM student s2
+        WHERE s2.school_id = s.school_id AND s2.GPA > s.GPA) <= 3
+ORDER BY s.school_id, s.GPA DESC;
