@@ -37,7 +37,7 @@ CREATE TABLE customer (
 
 -- Create the `account` table
 CREATE TABLE account (
-    AccountNo INT PRIMARY KEY,
+    AccountNo VARCHAR(20) PRIMARY KEY,
     cust_id INT NOT NULL,
     account_location VARCHAR(255),
     currency_code VARCHAR(10),
@@ -49,7 +49,7 @@ CREATE TABLE account (
 
 -- Create the `betting_1` table
 CREATE TABLE betting_1 (
-    AccountNo INT NOT NULL,
+    AccountNo VARCHAR(20) NOT NULL,
     BetDate DATE,
     ClassId INT,
     CategoryId INT,
@@ -63,7 +63,7 @@ CREATE TABLE betting_1 (
 
 -- Create the `betting_2` table
 CREATE TABLE betting_2 (
-    AccountNo INT NOT NULL,
+    AccountNo VARCHAR(20) NOT NULL,
     Bet_Amt DECIMAL(10,2),
     Product VARCHAR(255),
     FOREIGN KEY (AccountNo) REFERENCES account(AccountNo) ON DELETE CASCADE
@@ -71,7 +71,7 @@ CREATE TABLE betting_2 (
 
 -- Create the `betting_3` table
 CREATE TABLE betting_3 (
-    AccountNo INT NOT NULL,
+    AccountNo VARCHAR(20) NOT NULL,
     Vegas DECIMAL(10,2),
     Sportsbook DECIMAL(10,2),
     Games DECIMAL(10,2),
