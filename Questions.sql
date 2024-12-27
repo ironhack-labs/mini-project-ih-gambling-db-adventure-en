@@ -15,239 +15,273 @@ SELECT * FROM school LIMIT 10;
 -- First Name and Last Name and Date of Birth for each of the customers.
 
 SELECT 
-    Title,
-    FirstName,
-    LastName,
-    DateOfBirth
+    title,
+    first_name,
+    last_name,
+    date_of_birth
 FROM 
     Customer;
+    
+    
 
 -- Question 02: Using customer table or tab, please write an SQL query that shows the number of customers in each customer group (Bronze, Silver & Gold).
 -- I can see visually that there are 4 Bronze, 3 Silver and 3 Gold but if there were a million customers how would I do this in Excel?
 
 SELECT 
-    CustomerGroup,
-    COUNT(*) AS CustomerCount
+    customer_group,
+    COUNT(*) AS customer_count
 FROM 
-    Customer
+    customer
 GROUP BY 
-    CustomerGroup;
+    customer_group;
 
 -- Question 03: The CRM manager has asked me to provide a complete list of all data for those customers in the customer table but 
 -- I need to add the currencycode of each player so she will be able to send the right offer in the right currency. 
 -- Note that the currencycode does not exist in the customer table but in the account table. Please write the SQL that would facilitate this.
 
-
 SELECT 
-    Customer.*,
-    Account.CurrencyCode
+    c.*,
+    a.currency_code
 FROM 
-    Customer
-INNER JOIN 
-    Account
+    customer c
+LEFT JOIN 
+    account a
 ON 
-    Customer.CustId = Account.CustId;
+    c.cust_id = a.cust_id;
+
 
 -- Question 04: Now I need to provide a product manager with a summary report that shows, by product and by day how 
 -- much money has been bet on a particular product. PLEASE note that the transactions are stored in the betting table 
 -- and there is a product code in that table that is required to be looked up (classid & categortyid) to determine which 
 -- product family this belongs to. Please write the SQL that would provide the report.
 
-SELECT
-    Betting.BetDate,
-    Product.product AS ProductFamily,
-    SUM(Betting.Bet_Amt) AS TotalBetAmount
-FROM
-    Betting
-INNER JOIN
-    Product
-ON
-    Betting.ClassId = Product.CLASSID AND
-    Betting.CategoryId = Product.CATEGORYID
-GROUP BY
-    Betting.BetDate,
-    Product.product
-ORDER BY
-    Betting.BetDate, Product.product;
+SELECT 
+    p.product_name,
+    b.BetDate,
+    SUM(b.Bet_Amt) AS total_bet_amount
+FROM 
+    betting_1 b
+JOIN 
+    product p
+ON 
+    b.ClassId = p.class_id AND b.CategoryId = p.category_id
+GROUP BY 
+    p.product_name, b.BetDate
+ORDER BY 
+    p.product_name, b.BetDate;
+
 
 -- Question 05: You’ve just provided the report from question 4 to the product manager, now he has emailed me and wants it changed. 
 -- Can you please amend the summary report so that it only summarizes transactions that occurred on or after 1st November and he only 
 -- wants to see Sportsbook transactions.Again, please write the SQL below that will do this.
 
+SELECT 
+    p.product_name,
+    b.BetDate,
+    SUM(b.Bet_Amt) AS total_bet_amount
+FROM 
+    betting_1 b
+JOIN 
+    product p
+ON 
+    b.ClassId = p.class_id AND b.CategoryId = p.category_id
+WHERE 
+    (MONTH(b.BetDate) = 11 AND DAY(b.BetDate) >= 1) AND p.product_name = 'Sportsbook'
+GROUP BY 
+    p.product_name, b.BetDate
+ORDER BY 
+    p.product_name, b.BetDate;
 
-SELECT
-    Betting.BetDate,
-    Product.product AS ProductFamily,
-    SUM(Betting.Bet_Amt) AS TotalBetAmount
-FROM
-    Betting
-INNER JOIN
-    Product
-ON
-    Betting.ClassId = Product.CLASSID AND
-    Betting.CategoryId = Product.CATEGORYID
-WHERE
-    (MONTH(Betting.BetDate) = 11 AND DAY(Betting.BetDate) >= 1)
-    OR MONTH(Betting.BetDate) IN (12)
-    AND Product.product = 'Sportsbook'
-GROUP BY
-    Betting.BetDate,
-    Product.product
-ORDER BY
-    Betting.BetDate, Product.product;
 
 -- Question 06: As often happens, the product manager has shown his new report to his director and now he also wants different version of this report. 
 -- This time, he wants the all of the products but split by the currencycode and customergroup of the customer, rather than by day and product. 
 -- He would also only like transactions that occurred after 1st December. Please write the SQL code that will do this.
 
-SELECT
-    MONTH(Betting.BetDate) AS Month,
-    Account.CurrencyCode,
-    Customer.CustomerGroup,
-    Product.product AS ProductFamily,
-    SUM(Betting.Bet_Amt) AS TotalBetAmount
-FROM
-    Betting
-INNER JOIN
-    Product
-ON
-    Betting.ClassId = Product.CLASSID AND
-    Betting.CategoryId = Product.CATEGORYID
-INNER JOIN
-    Account
-ON
-    Betting.AccountNo = Account.AccountNo
-INNER JOIN
-    Customer
-ON
-    Account.CustId = Customer.CustId
-WHERE
-    MONTH(Betting.BetDate) BETWEEN 12 AND 12 -- December, irrespective of the year
-GROUP BY
-    MONTH(Betting.BetDate),
-    Account.CurrencyCode,
-    Customer.CustomerGroup,
-    Product.product
-ORDER BY
-    MONTH(Betting.BetDate),
-    Account.CurrencyCode,
-    Customer.CustomerGroup,
-    Product.product;
+SELECT 
+    a.currency_code,
+    c.customer_group,
+    p.product_name,
+    SUM(b.Bet_Amt) AS total_bet_amount
+FROM 
+    betting_1 b
+JOIN 
+    account a
+ON 
+    b.AccountNo = a.AccountNo
+JOIN 
+    customer c
+ON 
+    a.cust_id = c.cust_id
+JOIN 
+    product p
+ON 
+    b.ClassId = p.class_id AND b.CategoryId = p.category_id
+WHERE 
+    MONTH(b.BetDate) = 12 AND DAY(b.BetDate) > 1
+GROUP BY 
+    a.currency_code, c.customer_group, p.product_name
+ORDER BY 
+    a.currency_code, c.customer_group, p.product_name;
+
 
 -- Question 07: Our VIP team have asked to see a report of all players regardless of whether they have done anything in the complete timeframe or not. 
 -- In our example, it is possible that not all of the players have been active. Please write an SQL query that shows all players Title, First Name and
 -- Last Name and a summary of their bet amount for the complete period of November.
 
-
 SELECT 
-    Customer.Title,
-    Customer.FirstName,
-    Customer.LastName,
-    COALESCE(SUM(Betting.Bet_Amt), 0) AS TotalBetAmount
+    c.title,
+    c.first_name,
+    c.last_name,
+    COALESCE(SUM(b.Bet_Amt), 0) AS total_bet_amount
 FROM 
-    Customer
+    customer c
 LEFT JOIN 
-    Account
+    account a
 ON 
-    Customer.CustId = Account.CustId
+    c.cust_id = a.cust_id
 LEFT JOIN 
-    Betting
+    betting_1 b
 ON 
-    Account.AccountNo = Betting.AccountNo
-    AND MONTH(Betting.BetDate) = 11  -- Filter for November, irrespective of year
+    a.AccountNo = b.AccountNo AND MONTH(b.BetDate) = 11
 GROUP BY 
-    Customer.Title, 
-    Customer.FirstName, 
-    Customer.LastName
+    c.title, c.first_name, c.last_name
 ORDER BY 
-    Customer.LastName, 
-    Customer.FirstName;
+    c.last_name, c.first_name;
+
 
 -- Question 08: Our marketing and CRM teams want to measure the number of players who play more than one product. 
 -- Can you please write 2 queries, one that shows the number of products per player and another that shows players who play both Sportsbook and Vegas.
 
-
+-- Number of Products Per Player
 SELECT 
-    Betting.AccountNo
+    c.first_name,
+    c.last_name,
+    b.AccountNo,
+    COUNT(DISTINCT b.Product) AS num_products
 FROM 
-    Betting
-INNER JOIN 
-    Product
+    betting_1 b
+JOIN 
+    account a
 ON 
-    Betting.ClassId = Product.CLASSID 
-    AND Betting.CategoryId = Product.CATEGORYID
-WHERE 
-    Product.product IN ('Sportsbook', 'Vegas')
+    b.AccountNo = a.AccountNo
+JOIN 
+    customer c
+ON 
+    a.cust_id = c.cust_id
 GROUP BY 
-    Betting.AccountNo
+    c.first_name, c.last_name, b.AccountNo
+ORDER BY 
+    num_products DESC;
+
+
+--  Query 2: Players Who Play Both Sportsbook and Vegas
+SELECT 
+    c.first_name,
+    c.last_name,
+    b.AccountNo
+FROM 
+    betting_1 b
+JOIN 
+    account a
+ON 
+    b.AccountNo = a.AccountNo
+JOIN 
+    customer c
+ON 
+    a.cust_id = c.cust_id
+WHERE 
+    b.Product IN ('Sportsbook', 'Vegas')
+GROUP BY 
+    c.first_name, c.last_name, b.AccountNo
 HAVING 
-    COUNT(DISTINCT Product.product) = 2;
+    COUNT(DISTINCT b.Product) = 2;
+
+
 
 -- Question 09: Now our CRM team want to look at players who only play one product, please write SQL code that shows the players who only play at sportsbook,
 -- use the bet_amt > 0 as the key. Show each player and the sum of their bets for both products.
 
 SELECT 
-    Betting.AccountNo,
-    SUM(CASE WHEN Product.product = 'Sportsbook' THEN Betting.Bet_Amt ELSE 0 END) AS SportsbookBetAmount
+    c.first_name,
+    c.last_name,
+    SUM(b3.Sportsbook) AS sportsbook_bet_total
 FROM 
-    Betting
-INNER JOIN 
-    Product
+    betting_3 b3
+JOIN 
+    account a
 ON 
-    Betting.ClassId = Product.CLASSID 
-    AND Betting.CategoryId = Product.CATEGORYID
+    b3.AccountNo = a.AccountNo
+JOIN 
+    customer c
+ON 
+    a.cust_id = c.cust_id
 WHERE 
-    Betting.Bet_Amt > 0
+    b3.Sportsbook > 0 
+    AND COALESCE(b3.Vegas, 0) = 0
+    AND COALESCE(b3.Games, 0) = 0
+    AND COALESCE(b3.Casino, 0) = 0
+    AND COALESCE(b3.Poker, 0) = 0
+    AND COALESCE(b3.Bingo, 0) = 0
+    AND COALESCE(b3.N_A, 0) = 0
+    AND COALESCE(b3.Adjustments, 0) = 0
 GROUP BY 
-    Betting.AccountNo
-HAVING 
-    COUNT(DISTINCT CASE WHEN Product.product != 'Sportsbook' THEN Product.product ELSE NULL END) = 0
-    AND SUM(CASE WHEN Product.product = 'Sportsbook' THEN Betting.Bet_Amt ELSE 0 END) > 0
+    c.first_name, c.last_name
 ORDER BY 
-    SportsbookBetAmount DESC;
-
+    sportsbook_bet_total DESC;
 
 -- Question 10: The last question requires us to calculate and determine a player’s favorite product. 
 -- This can be determined by the most money staked. Please write a query that will show each players favorite product.
 
-
-
-SELECT 
-    Betting.AccountNo,
-    Product.product AS FavoriteProduct,
-    SUM(Betting.Bet_Amt) AS TotalBetAmount
-FROM 
-    Betting
-INNER JOIN 
-    Product
-ON 
-    Betting.ClassId = Product.CLASSID 
-    AND Betting.CategoryId = Product.CATEGORYID
-WHERE 
-    Betting.Bet_Amt > 0
-GROUP BY 
-    Betting.AccountNo, Product.product
-HAVING 
-    SUM(Betting.Bet_Amt) = (
-        SELECT MAX(TotalBet) 
-        FROM (
+WITH PlayerProductTotals AS (
+    SELECT 
+        c.first_name,
+        c.last_name,
+        b.AccountNo,
+        b.Product,
+        SUM(b.Bet_Amt) AS total_staked
+    FROM 
+        betting_1 b
+    JOIN 
+        account a
+    ON 
+        b.AccountNo = a.AccountNo
+    JOIN 
+        customer c
+    ON 
+        a.cust_id = c.cust_id
+    GROUP BY 
+        c.first_name, c.last_name, b.AccountNo, b.Product
+),
+PlayerFavoriteProduct AS (
+    SELECT 
+        first_name,
+        last_name,
+        AccountNo,
+        Product AS favorite_product,
+        total_staked
+    FROM 
+        PlayerProductTotals
+    WHERE 
+        (AccountNo, total_staked) IN (
             SELECT 
-                Betting.AccountNo, 
-                SUM(Betting.Bet_Amt) AS TotalBet
+                AccountNo, MAX(total_staked)
             FROM 
-                Betting
-            INNER JOIN 
-                Product
-            ON 
-                Betting.ClassId = Product.CLASSID 
-                AND Betting.CategoryId = Product.CATEGORYID
-            WHERE 
-                Betting.Bet_Amt > 0
+                PlayerProductTotals
             GROUP BY 
-                Betting.AccountNo, Product.product
-        ) AS PlayerTotals
-        WHERE PlayerTotals.AccountNo = Betting.AccountNo
-    )
+                AccountNo
+        )
+)
+SELECT 
+    first_name,
+    last_name,
+    AccountNo,
+    favorite_product,
+    total_staked
+FROM 
+    PlayerFavoriteProduct
 ORDER BY 
-    Betting.AccountNo;
+    last_name, first_name;
+    
+
+
 

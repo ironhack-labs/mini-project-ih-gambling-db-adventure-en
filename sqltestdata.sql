@@ -94,24 +94,16 @@ CREATE TABLE product (
 );
 -- Create the `school` table
 CREATE TABLE school (
-    school_id INT PRIMARY KEY,         
+    school_id INT PRIMARY KEY,
     school_name VARCHAR(255) NOT NULL,
-    school_city VARCHAR(255) NOT NULL
+    city VARCHAR(255) NOT NULL
 );
 
--- Create the `student` table
 CREATE TABLE student (
     student_id INT PRIMARY KEY,
     student_name VARCHAR(255) NOT NULL,
     city VARCHAR(255) NOT NULL,
-    school_id INT,
+    school_id INT NOT NULL,
     GPA FLOAT,
-    FOREIGN KEY (school_id) REFERENCES school(school_id) ON DELETE CASCADE
+    FOREIGN KEY (school_id) REFERENCES school(school_id)
 );
-
-
-
-
-
-
-
